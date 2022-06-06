@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css"> 
+</head>
+<body>
+    <script src="simple.js"> 
+        
+        // This is just a sample script. Paste your real code (javascript or HTML) here.
+let player1 = {
+    x: 200,
+    y: 200,
+    Attack: 5,
+    HP: 100
+}; //variabel för första spelaren.
+
+
+var zombies = [];
+let bullets = [];
+var i = 0
+while (i < 30) //Antalet zombies som ska spanna.
+{
+    zombies.push({
+        x: random(totalWidth), //I vilken bredd ska zombie spanna. 
+        y: random(totalHeight), //I vilken höjd ska zombie spanna.
+        speed: random(1, 3),
+        Hp: 200,
+        Attack: 1,
+        alive: 1
+    }); //hur fort en zombie ska röra sig.
+
+    i += 1;
+}
+
+var score = 0;
+
+function update() {
+    clearScreen();
+    circle(player1.x, player1.y, 10, "red") // att player ska vara en cirkel.
+
+    //kontroller för första eplaren ska röra sig.
+    if (keyboard.d) {
+        player1.x += 5
+    } //Gå åt höger 
+    if (keyboard.a) {
+        player1.x -= 5
+    } //Gå åt vänster 
+    if (keyboard.w) {
+        player1.y -= 5
+    } //Gå uppåt
+    if (keyboard.s) {
+        player1.y += 5
+    } //Gå neråt 
+
+    // koder för att spelaren ska inte kunna lämna skärmen. 
+    if (player1.x < 0) {
+        player1.x = +0
+    } //Högst upp
+    if (player1.y < 0) {
+        player1.y = +0
+    } //Vänster sidan 
+    if (player1.x > totalWidth) {
+        player1.x = totalWidth
+    } //Höger sidan
+    if (player1.y > totalHeight) {
+        player1.y = totalHeight
+    } //Längst ner
+    var ent = 30;
+    var i = 0;
+    while (i < ent) {
+        var zombie = zombies[i];
+
+        //score system
+        if (!(zombie.alive == 1)) {
+            i++;
+            continue;
+        }
+        //health system 
+        bredd = 51
+        PxperHP = bredd / 200;
+        rectangle(zombie.x + 73 - bredd, zombie.y - 20, 55, 8, "black"); //utseende för den svarta rektangeln 
+        if (zombie.Hp > 0) {
+            rectangle(zombie.x + 75 - bredd, zombie.y - 20, PxperHP * zombie.Hp, 5, "green") //hur HP ska minska 
+        }
+
+        picture(zombie.x, zombie.y, "http://spelprogrammering.nu/bilder/zombie.png"); //utseende för zombie 
+
+        // hur en zombie ska kunna röra sig och vad ska den följa efter.
+        if (zombie.x < player1.x) {
+            zombie.x += zombie.speed;
+        } else {
+            zombie.x -= zombie.speed;
+        }
+        if (zombie.y < player1.y) {
+            zombie.y += zombie.speed;
+        } else {
+            zombie.y -= zombie.speed;
+        }
+        // Hur skotten ska skada zombisarna 
+        var f = 0;
+        while (f < bullets.length) {
+            if (bullets[f].x > zombie.x && bullets[f].x < zombie.x + 30 && bullets[f].y > zombie.y && bullets[f].y < zombie.y + 60) {
+                zombie.Hp -= player1.Attack;
+            }
+            f += 1;
+        }
+        //hur zombisar ska ta bort från skärmen 
+        if (zombie.Hp <= 0) {
+            zombie.alive = 0;
+            score += 1;
+        }
+        i += 1;
+    }
+    //skott delen 
+    //Trycker du på space kanppen kommer du sjuta skott.
+    if (keyboard.space) {
+        var v = Math.atan2((mouse.y - player1.y), (mouse.x - player1.x)); // range (-PI, PI]
+        v *= 180 / Math.PI; // rads to degs, range (-180, 180]
+
+        // Man räknar ut X och Y hastigheten för varje skott. 
+        bullets.push({
+            x: player1.x,
+            y: player1.y,
+            speed: 5,
+            speedX: Math.cos(v * (Math.PI / 180)) * 15,
+            speedY: Math.sin(v * (Math.PI / 180)) * 15
+        });  
+
+        console.log(v) // för att skriva ut vinklen 
+    }
+    i = 0;
+
+    while (i < bullets.length) {
+        bullets[i].x += bullets[i].speedX; // värdet På skotten i X led
+        bullets[i].y += bullets[i].speedY; // värdet på skotten i y led 
+
+        circle(bullets[i].x, bullets[i].y, 5, "red"); //storleken och utseenden för skotten.
+        i += 1;
+    }
+
+    Bredd = 51; //bredden på min healthbar
+    pxPerHP = Bredd / 100; //hp per pixel
+
+    rectangle(player1.x + 20 - Bredd, player1.y - 23, 55, 8, "black") //utseende på Healthbar
+    if (player1.HP > 0) //krev på att om spelaren har större HP än 0
+    {
+        rectangle(player1.x + 22 - Bredd, player1.y - 22, pxPerHP * player1.HP, 5, "green") //Hur den gröna delen av din healthbar ska se ut
+    }
+    //Om zombissen kommer närmare än 5 pixlar ska spelaren bli skadad 
+    if (distance(player1, zombie) < 5) {
+        player1.HP -= zombie.Attack; //spelarens HP ska minska med skadan som zombisen gör 
+    }
+    if (player1.HP <= 0) //om splaren Hp är midre än eller lika med noll så har du förlurat 
+    {
+        alert("GAME OVER")
+        stopUpdate();
+    }
+}
+
+
+
+    </script>
+</body>
+</html>
